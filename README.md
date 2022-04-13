@@ -5,7 +5,7 @@
 
 ##### Stack : 
 
-Frontend - Vuejs
-Backend - Nodejs, AWS S3 or RDB
-Contract - Openzeppelin, Truffle
-Cloud(Front, Back deployment) - AWS EC2 
+Frontend - Vuejs  
+Backend - Nodejs, AWS S3 or RDB  
+Contract - Openzeppelin, Truffle  
+Cloud(Front, Back deployment) - AWS EC2  
