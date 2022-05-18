@@ -4,6 +4,6 @@
 
 #### Stack : 
 Frontend - Vuejs  
-Backend - Nodejs, AWS S3 or RDB  
+Backend - Nodejs  
 Contract - Openzeppelin, Truffle  
-Cloud(Front, Back deployment) - AWS EC2  
+Cloud(Front, Back deployment) - AWS EC2, cloudinary
