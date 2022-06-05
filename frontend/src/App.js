@@ -1,8 +1,8 @@
 import { WalletProvider } from "./contexts/wallet-context";
-import styled from "styled-components";
 import Header from "./components/Header";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Home from "./components/Home";
+import styled from 'styled-components'
 
 const Layout = styled.div`
   width: 100%;
