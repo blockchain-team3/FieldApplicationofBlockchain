@@ -4,6 +4,10 @@ import cloudinary.uploader
 import cloudinary.api
 from PIL import Image
 import sys
+import json
+import os
+import urllib.request
+import random
 
 # OPTIONS
 WIDTH = 100
@@ -15,11 +19,40 @@ Image.MAX_IMAGE_PIXELS = None
 
 def get_directory():
     # 여기에 어떻게 희수님 클라우디너리에서 사진 49개 받아올지 짜야합니다. 지금은 그냥 로컬에 넣어놓은 사진으로 쓰는 중
-    dir = "./pictures/"
-    files = glob.glob(dir+"*.*")
-    file_list = files
+    
+    # 기존에 존재하던 파일들 삭제
+    file_list = glob.glob("./pictures_cldnry/"+"*.*")
+    for file in file_list:
+        os.remove(file)
+    
+    # 클라우디너리 API로 계정의 asset 정보 받아오기.
+    rsrcList = json.loads(json.dumps(cloudinary.api.resources(type = "upload"), sort_keys=True, indent=2))['resources']
+    # print(json.dumps(resList, sort_keys=True, indent=2))
+    # print(rsrcList[0])
+    
+    # 클라우디너리 계정 asset 정보를 통해 이미지 다운로드.
+    for i in range(len(rsrcList)):
+        img_url = rsrcList[i]['url']
+        dirList = img_url.split('/')
+        if dirList[7] == 'samples':
+            continue
+        img_name = dirList[7]
+        
+        urllib.request.urlretrieve(img_url, "./pictures_cldnry/" + img_name)
+    
+    # 다운받은 모든 사진들의 경로가 담긴 list
+    file_list = glob.glob("./pictures_cldnry/"+"*.*")
+    # print("file_list: " , file_list)
+    
+    # 사진이 49장보다 많으면 일부만 사용.
     if len(file_list)>49:
         file_list = file_list[:49]
+    
+    # 사진이 부족하면 랜덤으로 채워주는 기능
+    # if len(file_list)<49:
+    #     list_add = [random.choice(file_list) for _ in range(49 - len(file_list))]
+    #     file_list = file_list + list_add
+    
     return file_list 
 
 def resize_pics(file_list):
@@ -28,7 +61,8 @@ def resize_pics(file_list):
     sum_name = ""
     for dir in file_list:
         resized.append((Image.open(dir)).resize((WIDTH,HEIGHT)))
-        sum_name += dir.strip()+"_"
+        sum_name += os.path.split(dir)[1].replace(".png","").replace(".jpg","") + "_"
+        # print(os.path.split(dir)[1] + "_")
     return resized, sum_name
 
 def combine(resized_list):
@@ -46,27 +80,34 @@ def combine(resized_list):
             row_cnt = 0
             col_cnt += 1
 
-    comb_image.save("./pictures/comb_image.jpg","JPEG")
+    comb_image.save("./pictures_cldnry/export/comb_image.jpg","JPEG")
     # comb_image.show()
+    
+    # 사진 사용 후 전부 삭제
+    file_list = glob.glob("./pictures_cldnry/"+"*.*")
+    for file in file_list:
+        os.remove(file)
 
 def upload(path):
     # print("uploading the combined picture to cloudinary...")
-    cloudinary.config( 
-        cloud_name = "daeyong", 
-        api_key = "888595591856965", 
-        api_secret = "ihOBwpo-C3IQcezVVAC0pZLoiOA" 
-    )
-    summary = cloudinary.uploader.upload(path)
+    
+    summary = cloudinary.uploader.upload(path, folder = 'export', use_filename = True)
     url = summary['url']
     return url
 
 
 if __name__ == "__main__":
- 
+    cloudinary.config( 
+        cloud_name = "daeyong", 
+        api_key = "888595591856965", 
+        api_secret = "ihOBwpo-C3IQcezVVAC0pZLoiOA" 
+    )
     file_list = get_directory() # 파일들 리스트로 정리
     resized, res_name = resize_pics(file_list) # resize한 결과와 사진 이름
     combine(resized) # 사진 합치기
-    res_url = upload("./pictures/comb_image.jpg") # 클라우디너리에 업로드
-    res_name = res_name.replace("./pictures/", "").replace(".jpg","") # 사진 이름 가공
-    print(res_url) # 출력해야지만 노드에서 받아서 활용함
+    
+    res_url = upload("./pictures_cldnry/export/comb_image.jpg") # 클라우디너리에 업로드
+    
+    # 출력 내용. (노드에서 활용)
+    print(res_url) 
     print(res_name)
