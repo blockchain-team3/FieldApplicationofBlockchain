@@ -34,10 +34,11 @@ def get_directory():
     for i in range(len(rsrcList)):
         img_url = rsrcList[i]['url']
         dirList = img_url.split('/')
-        if dirList[7] == 'samples':
+        if dirList[7] == 'samples' or dirList[7] == 'export':
             continue
         img_name = dirList[7]
-        
+        # print(dirList)
+        # print(img_name)
         urllib.request.urlretrieve(img_url, "./pictures_cldnry/" + img_name)
     
     # 다운받은 모든 사진들의 경로가 담긴 list
