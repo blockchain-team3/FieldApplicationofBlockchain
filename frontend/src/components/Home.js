@@ -46,7 +46,7 @@ export default function Home() {
         },
         (err, result) => {
           if (result.event === "success") {
-            fetch(`http://13.209.66.180:3000/exec`);
+            fetch(`http://13.209.66.180:3030/exec`);
           }
         }
       ),
