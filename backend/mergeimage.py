@@ -50,9 +50,9 @@ def get_directory():
         file_list = file_list[:49]
     
     # 사진이 부족하면 랜덤으로 채워주는 기능
-    # if len(file_list)<49:
-    #     list_add = [random.choice(file_list) for _ in range(49 - len(file_list))]
-    #     file_list = file_list + list_add
+    if len(file_list)<49:
+        list_add = [random.choice(file_list) for _ in range(49 - len(file_list))]
+        file_list = file_list + list_add
     
     return file_list 
 
