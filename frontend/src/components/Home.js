@@ -39,10 +39,17 @@ export default function Home() {
 
   const widget = useMemo(
     () =>
-      window.cloudinary.createUploadWidget({
-        cloudName: "daeyong",
-        uploadPreset: "hb6qefbh",
-      }),
+      window.cloudinary.createUploadWidget(
+        {
+          cloudName: "daeyong",
+          uploadPreset: "hb6qefbh",
+        },
+        (err, result) => {
+          if (result.event === "success") {
+            fetch(`http://13.209.66.180:3000/exec`);
+          }
+        }
+      ),
     []
   );
 
