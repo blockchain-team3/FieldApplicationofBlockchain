@@ -4,11 +4,11 @@ import cors from "cors";
 import { mint } from "./mint.js";
 
 const app = express();
-const port = 3000;
+const port = 3030;
 
 // 포트 열기
 app.listen(port, function () {
-  console.log("start! express server on port 3000");
+  console.log("start! express server on port 3030");
 });
 
 // /exec로 리퀘 들어오면 다음 라인들 실행
@@ -30,6 +30,11 @@ const exec_python_script = () => {
     if (stdout) {
       // 파이썬 파일에서 출력한 url과 name 받아서 mint()에 인자로 줘서 실행
       let pythonres = stdout.toString();
+      if (pythonres == "no\n") {
+        console.log("EXECUTED");
+        return;
+      }
+
       const url = pythonres.split("\n")[0];
       const name = pythonres.split("\n")[1];
 

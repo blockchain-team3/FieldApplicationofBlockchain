@@ -12,8 +12,8 @@ import random
 # OPTIONS
 WIDTH = 100
 HEIGHT= 120
-COMBINED_WIDTH = WIDTH * 7
-COMBINED_HEIGHT = HEIGHT * 7
+COMBINED_WIDTH = WIDTH * 5
+COMBINED_HEIGHT = HEIGHT * 5
 Image.MAX_IMAGE_PIXELS = None
 
 
@@ -26,18 +26,19 @@ def get_directory():
         os.remove(file)
     
     # 클라우디너리 API로 계정의 asset 정보 받아오기.
-    rsrcList = json.loads(json.dumps(cloudinary.api.resources(type = "upload"), sort_keys=True, indent=2))['resources']
+    rsrcList = json.loads(json.dumps(cloudinary.api.resources(type = "upload" , max_results=500), sort_keys=True, indent=2))['resources']
     # print(json.dumps(resList, sort_keys=True, indent=2))
     # print(rsrcList[0])
     
     # 클라우디너리 계정 asset 정보를 통해 이미지 다운로드.
+    # print(rsrcList)
+    # print(len(rsrcList))
     for i in range(len(rsrcList)):
         img_url = rsrcList[i]['url']
         dirList = img_url.split('/')
         if dirList[7] == 'samples' or dirList[7] == 'export':
             continue
         img_name = dirList[7]
-        # print(dirList)
         # print(img_name)
         urllib.request.urlretrieve(img_url, "./pictures_cldnry/" + img_name)
     
@@ -45,14 +46,14 @@ def get_directory():
     file_list = glob.glob("./pictures_cldnry/"+"*.*")
     # print("file_list: " , file_list)
     
+    
     # 사진이 49장보다 많으면 일부만 사용.
-    if len(file_list)>49:
-        file_list = file_list[:49]
+    file_list = file_list[:25]
     
     # 사진이 부족하면 랜덤으로 채워주는 기능
-    if len(file_list)<49:
-        list_add = [random.choice(file_list) for _ in range(49 - len(file_list))]
-        file_list = file_list + list_add
+    # if len(file_list)<49:
+    #     list_add = [random.choice(file_list) for _ in range(49 - len(file_list))]
+    #     file_list = file_list + list_add
     
     return file_list 
 
@@ -77,7 +78,7 @@ def combine(resized_list):
         comb_image.paste(img, (curr_loc_x, curr_loc_y))
 
         row_cnt += 1
-        if row_cnt == 7:
+        if row_cnt == 5:
             row_cnt = 0
             col_cnt += 1
 
@@ -104,11 +105,15 @@ if __name__ == "__main__":
         api_secret = "ihOBwpo-C3IQcezVVAC0pZLoiOA" 
     )
     file_list = get_directory() # 파일들 리스트로 정리
-    resized, res_name = resize_pics(file_list) # resize한 결과와 사진 이름
-    combine(resized) # 사진 합치기
+    if len(file_list)<25:
+        print("no")
     
-    res_url = upload("./pictures_cldnry/export/comb_image.jpg") # 클라우디너리에 업로드
-    
-    # 출력 내용. (노드에서 활용)
-    print(res_url) 
-    print(res_name)
+    else:
+        resized, res_name = resize_pics(file_list) # resize한 결과와 사진 이름
+        combine(resized) # 사진 합치기
+        
+        res_url = upload("./pictures_cldnry/export/comb_image.jpg") # 클라우디너리에 업로드
+        
+        # 출력 내용. (노드에서 활용)
+        print(res_url) 
+        print(res_name)
